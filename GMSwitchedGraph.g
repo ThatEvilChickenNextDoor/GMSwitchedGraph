@@ -29,7 +29,7 @@ for p in part[1] do
 	fi;
 	#Check if each element in C_i is a vertex
 	for f in p do
-		if not IsIntegers(f) then
+		if not IsInt(f) then
 			Print("each element of C_i must be an integer");
 			return;
 		fi;
