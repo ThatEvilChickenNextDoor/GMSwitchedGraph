@@ -1,6 +1,6 @@
 GMSwitchedGraph:= function(part, graph)
 #Define local variables
-local p, Switched;
+local p, f, Switch;
 #Check if given partition is a list
 if not IsList(part) then
 	Print("first argument must be a list");
