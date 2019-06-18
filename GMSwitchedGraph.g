@@ -34,5 +34,13 @@ fi;
 
 Print(part[1], "\n");
 Print(part[2], "\n");
-Print(graph);
+Print(graph, "\n");
+
+Switch:=graph;
+
+for p in part[1] do	
+	
 end;
+
+#Position(VertexNames(graph),x);
+#VertexNames(graph)[Position(Vertices(graph),y)];
