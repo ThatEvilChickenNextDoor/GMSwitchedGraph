@@ -114,7 +114,7 @@ od;
 
 #Construct output graph from edge list
 
-outGraph:=Graph(Group(()), Vertices(oct), OnPoints, function(x,y) return [x,y] in edges or [y,x] in edges; end);
+outGraph:=Graph(Group(()), Vertices(graph), OnPoints, function(x,y) return [x,y] in edges or [y,x] in edges; end);
 return outGraph;
 
 end;
