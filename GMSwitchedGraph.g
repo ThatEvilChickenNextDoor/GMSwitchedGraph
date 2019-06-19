@@ -2,7 +2,7 @@ GMSwitchedGraph:= function(part, graph)
 
 #Define local variables
 
-local p, f, d, c, C, v, adjCount, adjCountList, toSwitch, edges, outGraph;
+local p, f, d, c, C, v, i, n, adjCount, adjCountList, adjList, toSwitch, edges, outGraph;
 
 #Check if inputs are structrually valid
 
@@ -54,18 +54,26 @@ fi;
 
 #TODO: Check if partitions are mathematically valid
 
-adjCountList:=[]; #initialize list for counting neighbors
-
-for c in part[1] do
-	Add(adjCountList, -1);
-od;
-
 for c in part[1] do #start measuring number of neighbors for each vertex
-	for v in c do
-		adjCount:=0;
-		
-	
-		
+	adjCountList:=[]; #initialize list for counting neighbors
+	for v in part[1] do
+		Add(adjCountList, -1);
+	od;
+	for v in c do #start checking
+		adjList:=Adjacency(graph, v);
+		for i in [1..Length(part[1])] do
+			n:=Length(Intersection(part[1][i], adjList));
+			if not adjCountList[i]=n then
+				if adjCountList[i]=-1 then
+					adjCountList[i]:=n;
+				else
+					Print("invalid partition");
+					return;
+				fi;
+			fi;
+		od;
+	od;
+od;
 
 #Do the switch
 
