@@ -61,17 +61,29 @@ for c in part[1] do #start measuring number of neighbors for each vertex
 	od;
 	for v in c do #start checking
 		adjList:=Adjacency(graph, v);
-		for i in [1..Length(part[1])] do
-			n:=Length(Intersection(part[1][i], adjList));
-			if not adjCountList[i]=n then
-				if adjCountList[i]=-1 then
-					adjCountList[i]:=n;
-				else
+		for i in [1..Length(part[1])] do #loop through all c's in partition
+			adjCount:=Length(Intersection(part[1][i], adjList)); #calculate number of neighbors with this c
+			if not adjCountList[i]=adjCount then #check if number of neighbors is inconsistent
+				if adjCountList[i]=-1 then #if first run, store number of neighbors in list
+					adjCountList[i]:=adjCount;
+				else #if not first run, throw error
 					Print("invalid partition");
 					return;
 				fi;
 			fi;
 		od;
+	od;
+od;
+
+for d in part[2] do
+	Print(d, "\n");
+	for C in part[1] do
+		adjList:=Adjacency(graph, d);
+		adjCount:=Length(Intersection(C, adjList));
+		if not adjCount=Length(C)/2 and not adjCount=Length(C) and not adjCount=0 then
+			Print("invalid D");
+			return;
+		fi;
 	od;
 od;
 
@@ -81,12 +93,8 @@ edges:=UndirectedEdges(graph); #gather all edges from original graph before swit
 for d in part[2] do #gather all vertices that need to be switched for each vertex in D
 	toSwitch:=[]; #list to hold vertices that need to be switched wrt d
 	for C in part[1] do #determine which c's should be switched
-		adjCount:=0;
-		for c in C do
-			if IsEdge(graph, [d, c]) then
-				adjCount:= adjCount+1;
-			fi;
-		od;
+		adjList:=Adjacency(graph, d);
+		adjCount:=Length(Intersection(C, adjList));
 		if adjCount = Length(C)/2 then #only add the vertices in c to the list to be switched if d is adjacent to exactly half of its vertices
 			Append(toSwitch, C);
 		fi;
