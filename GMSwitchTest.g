@@ -1,12 +1,11 @@
 GMSwitchTest:= function(toTest, graph)
 
-local i, V, C, o, counter, fails, successList, nonIsoList, charPoly;
+local i, V, C, o, counter, successList, nonIsoList, charPoly;
 
 successList:=[];
 nonIsoList:=[];
 counter:=0;
-fails:=0;
-charPoly:=CharacteristicPolynomial(AdjacencyMatrix(graph));
+
 if not IsList(toTest) then
 	Print("first argument must be a list to test", "\n");
 	return -1;
@@ -18,6 +17,7 @@ if not IsGraph(graph) then
 fi;
 
 V:=Length(Vertices(graph));
+charPoly:=CharacteristicPolynomial(AdjacencyMatrix(graph));
 
 for i in toTest do
 	C:=Difference([1..V], i);;
@@ -33,12 +33,10 @@ for i in toTest do
 			fi;
 		fi;
 		Print("\n");
-	else
-		fails:=fails+1;;
 	fi;
 	counter:=counter+1;;
 od;
-Print("Out of ", Length(toTest), " candidates, we tested ", counter, " and failed ", fails, " times.");
+Print(Length(toTest), " inputs, ", counter, " tested, ", Length(successList), " valid switches, ", Length(nonIsoList), " not isomorphic\n");
 return [successList, nonIsoList];
 
 end;
