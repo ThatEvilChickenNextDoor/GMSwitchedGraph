@@ -54,44 +54,44 @@ fi;
 
 #Check if partitions are mathematically valid
 
-for c in part[1] do #start measuring number of neighbors for each vertex
-	adjCountList:=[]; #initialize list for counting neighbors
-	for v in part[1] do
-		Add(adjCountList, -1);
-	od;
+#for c in part[1] do #start measuring number of neighbors for each vertex
+#	adjCountList:=[]; #initialize list for counting neighbors
+#	for v in part[1] do
+#		Add(adjCountList, -1);
+#	od;
 #	Print("adjCountList", "\t", adjCountList, "\n");
-	for v in c do #start checking
-		adjList:=Adjacency(graph, v);
+#	for v in c do #start checking
+#		adjList:=Adjacency(graph, v);
 #		Print(v, "\n");
 #		Print("adjList", "\t", adjList, "\n");
-		for i in [1..Length(part[1])] do #loop through all c's in partition
-			adjCount:=Length(Intersection(part[1][i], adjList)); #calculate number of neighbors with this c
+#		for i in [1..Length(part[1])] do #loop through all c's in partition
+#			adjCount:=Length(Intersection(part[1][i], adjList)); #calculate number of neighbors with this c
 #			Print("adjCount", "\t", adjCount, "\n");
 #			Print("adjCountList", "\t", adjCountList, "\n");
-			if not adjCountList[i]=adjCount then #check if number of neighbors is inconsistent
+#			if not adjCountList[i]=adjCount then #check if number of neighbors is inconsistent
 #				Print("not in list", "\n");
-				if adjCountList[i]=-1 then #if first run, store number of neighbors in list
-					adjCountList[i]:=adjCount;
-				else #if not first run, throw error
+#				if adjCountList[i]=-1 then #if first run, store number of neighbors in list
+#					adjCountList[i]:=adjCount;
+#				else #if not first run, throw error
 #					Print("invalid partition", "\n");
 #					return -1;
-				fi;
-			fi;
-		od;
-	od;
-od;
+#				fi;
+#			fi;
+#		od;
+#	od;
+#od;
 
-for d in part[2] do
-	Print(d, "\n");
-	for C in part[1] do
-		adjList:=Adjacency(graph, d);
-		adjCount:=Length(Intersection(C, adjList));
-		if not adjCount=Length(C)/2 and not adjCount=Length(C) and not adjCount=0 then
+#for d in part[2] do
+#	Print(d, "\n");
+#	for C in part[1] do
+#		adjList:=Adjacency(graph, d);
+#		adjCount:=Length(Intersection(C, adjList));
+#		if not adjCount=Length(C)/2 and not adjCount=Length(C) and not adjCount=0 then
 #			Print("invalid D", "\n");
 #			return -1;
-		fi;
-	od;
-od;
+#		fi;
+#	od;
+#od;
 
 #Do the switch
 
