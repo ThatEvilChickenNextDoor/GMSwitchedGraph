@@ -4,21 +4,23 @@ ExtendSets2:= function(G, l, V)
 
 local new, i , j, last, poss, prereps, reps;
 
-new:= [];;
+new:= [];
 
 for i in l do
-	last:= Difference(V, i);
+	Print("Calculating for ", i, " ...\n");
+	last:=Combinations(Difference(V, i), 2);
 	poss:= List(last, j -> AsSet(Concatenation(i,[j])));
-	prereps:= List(Orbits(G, poss, OnSets), Representative);
-        for j in prereps do
-		if not j in new then
-			Add(new, j);
-		fi;
-	od;
+#	Print("Calculating orbits for ", i, " ...\n");
+#	prereps:= List(Orbits(G, poss, OnSets), Representative);
+#    for j in prereps do
+	if not poss in new then
+		Add(new, poss);
+	fi;
+#	od;
 od;
+#Print("Calculating final orbits...\n");
+#reps:= List(Orbits(G, new, OnSets), Representative);
 
-reps:= List(Orbits(G, new, OnSets), Representative);
-
-return reps;
+return new;
 
 end;
