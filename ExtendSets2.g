@@ -9,7 +9,7 @@ new:= [];
 for i in l do
 	Print("Calculating for ", i, " ...\n");
 	last:=Combinations(Difference(V, i), 2);
-	poss:= List(last, j -> AsSet(Concatenation(i,[j])));
+	poss:= List(last, j -> AsSet(Concatenation(i,j)));
 #	Print("Calculating orbits for ", i, " ...\n");
 #	prereps:= List(Orbits(G, poss, OnSets), Representative);
 #    for j in prereps do
