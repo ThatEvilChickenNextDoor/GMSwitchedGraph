@@ -4,7 +4,7 @@ local L, stabs, substabs, i, j, cos, orbs;
 
 L:=AllPrimitiveGroups(NrMovedPoints, O);
 stabs:=List(L, i->Stabilizer(i, 1));
-substabs:=List(stabs, i->Filtered(LowIndexSubgroups(i), I), j->Order(i)/Order(j)=I));
+substabs:=List(stabs, i->Filtered(LowIndexSubgroups(i, I), j->Order(i)/Order(j)=I));
 for i in [1..Length(L)] do
 	cos:=RightCosets(L[i], substabs[i]);
 	orbs:=Orbits(substabs[i], cos, OnRight);
