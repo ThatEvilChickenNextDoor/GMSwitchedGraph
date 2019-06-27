@@ -13,10 +13,8 @@ for i in [1..Length(L)] do
 		cos:=RightCosets(G, H);
 		orbs:=Orbits(H, cos, OnRight);
 		for j in orbs do
-			if Length(j)=O*I then
-				if IsDistanceRegular(CosetGraph(G, H, [j])) then
-					Add(outList, [G, H]);
-				fi;
+			if IsDistanceRegular(CosetGraph(G, H, [j])) then
+				Add(outList, [G, H, [j]]);
 			fi;
 		od;
 	od;
