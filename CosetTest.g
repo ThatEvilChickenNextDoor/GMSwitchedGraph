@@ -1,15 +1,16 @@
-CosetTest:= function(G, O, n)
+CosetTest:= function(O, I)
 
-local G1, subsG1, H, cos, orbs, i;
+local L, stabs, substabs, i, j, cos, orbs;
 
-G1:=Stabilizer(G, 1);
-subsG1:=Filtered(LowIndexSubgroups(G1, O), i->Order(G1)/Order(i)=O);
-for H in subsG1 do
-	cos:=RightCosets(G, H);
-	orbs:=Orbits(H, cos, OnRight);
-	for i in orbs do
-		if Length(i)=n then
-			Print(IsDistanceRegular(CosetGraph(G, H, [i])), "\n");
+L:=AllPrimitiveGroups(NrMovedPoints, O);
+stabs:=List(L, i->Stabilizer(i, 1));
+substabs:=List(stabs, i->Filtered(LowIndexSubgroups(i), I), j->Order(i)/Order(j)=I));
+for i in [1..Length(L)] do
+	cos:=RightCosets(L[i], substabs[i]);
+	orbs:=Orbits(substabs[i], cos, OnRight);
+	for j in orbs do
+		if Length(j)=O*I then
+			Print(IsDistanceRegular(CosetGraph(L[i], substabs[i], [j])), "\n");
 		fi;
 	od;
 od;
