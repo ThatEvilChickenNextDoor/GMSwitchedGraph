@@ -1,6 +1,6 @@
 CosetTest:= function(O, I)
 
-local L, stabs, substabs, stabs, G, H, i, j, cos, orbs, outList;
+local L, stabs, substabs, subs, G, H, i, j, cos, orbs, outList;
 
 outList:=[];
 L:=AllPrimitiveGroups(NrMovedPoints, O);
