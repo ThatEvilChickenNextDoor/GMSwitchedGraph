@@ -44,7 +44,7 @@
 static gsl_matrix *mat, *mat_inv;
 static gsl_permutation *perm;
 
-static gsl_vector *vecs[1<<N];
+static gsl_vector *vecs[1<<N]; //vecs  and vecs_prod are arrayss of vectors with size 2^N
 static gsl_vector *vecs_prod[1<<N];
 
 static gsl_vector *vec_j;
@@ -52,7 +52,7 @@ static gsl_vector *vec_j;
 /* storing the current graph6 string of our graph */
 static char line[G6LEN(N)+2];
 
-static char gcode[G6LEN(MAX_ORDER)+3]; 
+static char gcode[G6LEN(MAX_ORDER)+3]; //gcode is string with enough room to store graph of order MAX_ORDER
 
 /* number of currently processed graphs. */ 
 static unsigned nproc = 0;
@@ -126,67 +126,67 @@ gsl_vector *verts[1<<N];
 
 static void constructGraph(void) {
 
-    double res;
-    unsigned i, j;
+    double res; //allocate memory for double-sized result
+    unsigned i, j; //declare variables used for looping
 
     /* After the first iteration this holds the number of 
        vertices of the obtained graph. The respective vertices
        are stored in vecs_prod[0]...vecs_prod[cache_size-1].
     */ 
-    unsigned cache_size = 0; 
+    unsigned cache_size = 0; //initialize cache_size to 0
 
-    for (i = 0; i < 1<<N; i++) {
-        gsl_blas_dsymv(CblasUpper, 1, mat_inv, vecs[i], 0, vecs_prod[cache_size]);
+    for (i = 0; i < 1<<N; i++) { //loop through all 2^N vectors in vecs, looking to fill in the vertices
+        gsl_blas_dsymv(CblasUpper, 1, mat_inv, vecs[i], 0, vecs_prod[cache_size]); //set vecs_prod[cache_size] to mat_inv*vecs[i], assuming mat_inv is symmetrical and using upper triangle ((rI-A_H)^-1*u), this is the bilinear form <u,_>
 
-        gsl_blas_ddot(vecs_prod[cache_size], vec_j, &res);
+        gsl_blas_ddot(vecs_prod[cache_size], vec_j, &res); //calculate <u,j> and store it in space allocated for result
     
-        if (fabs(res+1) < EPS) {
-            gsl_blas_ddot(vecs_prod[cache_size], vecs[i], &res);
+        if (fabs(res+1) < EPS) { //if <u,j> = -1 (within EPS precision)
+            gsl_blas_ddot(vecs_prod[cache_size], vecs[i], &res); //calculate <u,u> and store it in space allocated for result
 
-            if (fabs(res-SC_EIG) < EPS) {
-                verts[cache_size] = vecs[i];
-                cache_size+=1;
+            if (fabs(res-SC_EIG) < EPS) { //if <u,u> = r (within EPS precision)
+                verts[cache_size] = vecs[i]; //it's a vertex, store vecs[i] in verts
+                cache_size+=1; //search for the next vector
             }                
         }
     }
-    
-    if (cache_size < EXPECTED_CLIQUE) {
+    //we now have matched arrays vert[] and vec_prod[], with valid vertices in the former and <u,_> in the latter
+    if (cache_size < EXPECTED_CLIQUE) { //if there aren't enough elements to form target clique, no point in continuing, skip to next star complement candidate
         skipped++;
         return;
     }
 
-    assert(cache_size < MAX_ORDER);
-
-    char *p = gcode;
+    assert(cache_size < MAX_ORDER); //check if order is less than maximum allowed order
+	//prepare to output compatibility graph
+    char *p = gcode; //point *p at start of gcode
     encodegraphsize(cache_size, &p);
 
-    int k = 6, x = 0;
+    int k = 6, x = 0; //initialize bit written counter and bit to be written
 
-    for (i = 1; i < cache_size; i++) {
-        for (j = 0; j < i; j++) {
-            x <<= 1;
-            gsl_blas_ddot(vecs_prod[i], verts[j], &res);
+    for (i = 1; i < cache_size; i++) { //loop through all vertices u_i
+        for (j = 0; j < i; j++) { //loop through <u_i,u_1> up to <u_i,u_i>, since <u,v> = <v,u> we don't have to check the rest as they will be checked in a later iteration
+            x <<= 1; //ready next bit
+            gsl_blas_ddot(vecs_prod[i], verts[j], &res); //calculate <u_i,u_j> and store it in space allocated for result
 
             /* We have an edge */
-            if (fabs(res) <= EPS || fabs(res+1) <= EPS) {
-                x |= 1;
+            if (fabs(res) <= EPS || fabs(res+1) <= EPS) { //if <u_i,u_j> = 0 or -1 (it's an edge)
+                x |= 1; //set last bit of x to 1
             } 
-            if (--k == 0) {
-                *p++ = BIAS6 + x;
-                k = 6;
+            if (--k == 0) { //decrease bit written counter
+                *p++ = BIAS6 + x; //if we wrote 6 bits, add padding for ASCII character and write byte to where *p is pointing and advance pointer *p forward by 1 character
+                k = 6; //reset counters
                 x = 0;
             }
  
         }
     }
-
-    if (k != 6) {
-        *p++ = BIAS6 + (x << k);
+	//all full bytes written to gcode, prepare to write to file
+    if (k != 6) { //if last byte is incomplete (still waiting to be written)
+        *p++ = BIAS6 + (x << k); //push last bits to front, add padding, write to *p, advance *p
     }        
-    *p++ = '\n';
-    *p = '\0';
+    *p++ = '\n'; //stitch on newline, advance *p
+    *p = '\0'; //stitch on null (to end string)
 
-    fputs(gcode, outFile);
+    fputs(gcode, outFile); //write to output file
 }
 
 
@@ -194,21 +194,21 @@ static void init_vectors(void) {
     
     unsigned i,j;
 
-    vec_j = gsl_vector_alloc(N);
+    vec_j = gsl_vector_alloc(N); //allocate memory for vec_j with size N
 
-    assert(vec_j);
+    assert(vec_j); //check if vec_j was created successfully
 
-    gsl_vector_set_all(vec_j, 1);
+    gsl_vector_set_all(vec_j, 1); //initialize vec_j as all 1's
 
-    for (i = 0; i < 1<<N; i++) {
-        vecs[i] = gsl_vector_calloc(N);
-        vecs_prod[i] = gsl_vector_alloc(N);
+    for (i = 0; i < 1<<N; i++) { //loop through all 2^N vectors in vecs[] and vecs_prod[]
+        vecs[i] = gsl_vector_calloc(N); //initialize each vecs[i] to all 0
+        vecs_prod[i] = gsl_vector_alloc(N); //allocate memory for vectors of size N
 
-        assert(vecs[i] && vecs_prod[i]);            
+        assert(vecs[i] && vecs_prod[i]); //check if vectors were initialized successfully        
 
         /* We fill the i'th vector of vecs */
-        for (j = 0; j < N; j++) {
-            if ( i & (1<<j) ) {
+        for (j = 0; j < N; j++) { //loop through length of vecs[i]
+            if ( i & (1<<j) ) { //set vecs[i] to binary representation of i
                 gsl_vector_set(vecs[i], j, 1);
             }
         }
