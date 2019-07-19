@@ -44,7 +44,7 @@
 static gsl_matrix *mat, *mat_inv;
 static gsl_permutation *perm;
 
-static gsl_vector *vecs[1<<N]; //vecs  and vecs_prod are arrayss of vectors with size 2^N
+static gsl_vector *vecs[1<<N]; //vecs and vecs_prod are arrays of vectors with size 2^N
 static gsl_vector *vecs_prod[1<<N];
 
 static gsl_vector *vec_j;
