@@ -1,3 +1,2 @@
 
-*.npy
-Python/combchecker/vecs.g
+Python/combchecker/output.npy
