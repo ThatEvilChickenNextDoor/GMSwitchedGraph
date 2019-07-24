@@ -2,8 +2,8 @@ import sys
 import numpy as np
 import networkx as nx
 
-EIGEN=2
-N=19
+EIGEN=3
+N=50
 MEM=26
 EPS= 0.000001
 
@@ -97,7 +97,7 @@ with open(filepath, 'rb') as fp: #create output file
 			#for v in vecs:
 				#print(v)
 				if counter % 10000 == 0:
-					print(counter, '/', 1<<N)
+					print(counter, '/', 1<<N, '\t', round(counter*100/(1<<N),10), '%', '\t', cache_size, 'hits')
 				cache_size += checkVert(v, cache_size)
 			A=constructGraph(cache_size)
 			op.write(nx.to_graph6_bytes(nx.Graph(A), header=False))
