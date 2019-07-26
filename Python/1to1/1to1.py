@@ -35,6 +35,8 @@ def constructGraph(mat_inv):
 	verts=np.empty_like(vecs)
 	#print('processing candidate vectors')
 	for i in range(1<<N):
+		if i % 10000 == 0:
+			print(i, '/', 1<<N, '\t', round(i*100/(1<<N),10), '%', '\t', cache_size, 'hits')
 		vecs_prod[cache_size]=np.dot(mat_inv, vecs[i])
 		res=np.dot(vecs_prod[cache_size], vec_j)
 		

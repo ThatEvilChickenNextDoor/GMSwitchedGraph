@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import networkx as nx
+import time
 
 EIGEN=3
 N=50
@@ -81,7 +82,7 @@ def nextV():
 
 #print('initializing vectors')
 #init_vectors()
-
+tic=time.time()
 #print('creating output file')
 filepath=sys.argv[1] #save input filepath
 with open(filepath, 'rb') as fp: #create output file
@@ -103,3 +104,4 @@ with open(filepath, 'rb') as fp: #create output file
 			op.write(nx.to_graph6_bytes(nx.Graph(A), header=False))
 			counter=0
 			s=fp.readline()
+print(time.time()-tic)
