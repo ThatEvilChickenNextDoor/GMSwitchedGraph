@@ -18,7 +18,7 @@ mat_inv=np.empty_like(mat)
 
 vecs=np.empty((121287375,50), 'B')
 
-vec_j=np.ones(N)
+vec_j=np.ones(N, 'B')
 
 nproc = skipped = 0
 #print('global constants initialized')
@@ -31,31 +31,38 @@ def stringtomat(s):
 
 #@njit
 def constructGraph(mat_inv, size):
-	cache_size=0
-	vecs_prod=np.empty_like(vecs)
-	verts=np.empty_like(vecs)
+	#cache_size=0
+	#print(mat_inv)
+	#vecs_prod=np.empty_like(vecs, 'float')
+	#verts=np.empty_like(vecs)
 	#print('processing candidate vectors')
-	for i in range(size):
-		if i % 10000 == 0:
-			print(i, '/', size, '\t', round(i*100/(size),10), '%', '\t', cache_size, 'hits')
-		vecs_prod[cache_size]=np.dot(mat_inv, vecs[i])
-		res=np.dot(vecs_prod[cache_size], vec_j)	
-		if abs(res+1) < EPS:
-			res=np.dot(vecs_prod[cache_size], vecs[i])
-			if abs(res-EIGEN) < EPS:
-				verts[cache_size] = vecs[i]
-				cache_size += 1
-	if cache_size < EXPECTED_CLIQUE:
-		return np.array([[0.]])
+	#for i in range(size):
+	#	if i % 10000 == 0:
+	#		print(i, '/', size, '\t', round(i*100/(size),10), '%', '\t', cache_size, 'hits')
+		#vecs_prod[cache_size]=np.dot(mat_inv, vecs[i])
+		#res=np.dot(vecs_prod[cache_size], vec_j)
+	#	res=np.linalg.multi_dot([vec_j, mat_inv, vecs[i]])
+	#	if abs(res+1) < EPS:
+			#res=np.dot(vecs_prod[cache_size], vecs[i])
+	#		res=np.linalg.multi_dot([vecs[i], mat_inv, vecs[i]])
+	#		if abs(res-EIGEN) < EPS:
+				#verts[cache_size] = vecs[i]
+				#cache_size += 1
+	#if cache_size < EXPECTED_CLIQUE:
+	#	return np.array([[0.]])
 
-	#print('finding edges')
-	A=np.zeros((cache_size, cache_size))
+	print('finding edges')
+	cache_size=size
+	#A=np.zeros((cache_size, cache_size), 'B')
 	for i in range(1, cache_size):
+		if i % 1000 == 0:
+			print(i)
 		for j in range(i):
-			res=np.dot(vecs_prod[i], verts[j])
+			res=np.linalg.multi_dot([vecs[i], mat_inv, vecs[j]])
 			if abs(res) <= EPS or abs(res+1) <= EPS:
-				A[i,j]=1
-				A[j,i]=1
+				#A[i,j]=1
+				#A[j,i]=1
+				print(i,j,'edge')
 	#print('writing graph')
 	return A
 	
@@ -68,7 +75,7 @@ def init_vectors():
 		for pos in combs[i]:
 			comb_vecs[i, pos]=1
 	print('combinations generated')
-	header = np.tile(np.array([1,0,0,0,1,0,0,0,0,0,0,0,0,0], 'uint8'), (len(vecs),1))
+	header = np.tile(np.array([1,0,0,0,0,0,0,0,1,0,0,0,0,0], 'uint8'), (len(vecs),1))
 	vecs[:,:14]=header
 	del(header)
 	first = np.repeat(comb_vecs, l**2, axis=0)
@@ -95,9 +102,10 @@ with open(filepath, 'rb') as fp: #create output file
 	with open(filepath + '.out', 'wb') as op: #open input file
 		s=fp.readline()
 		while s:
-			#print('processing line')
+			print('processing line')
 			mat_inv=stringtomat(s.strip())
-			#print('constructing graph')
+			#print(mat_inv)
+			print('constructing graph')
 			A=constructGraph(mat_inv, len(vecs))
 			if A.size != 1:
 				op.write(nx.to_graph6_bytes(nx.Graph(A), header=False))
