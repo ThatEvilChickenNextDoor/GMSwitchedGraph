@@ -1,7 +1,8 @@
 import sys
+from itertools import combinations
+import concurrent.futures
 import numpy as np
 import networkx as nx
-from itertools import combinations
 import numba
 
 EIGEN=2
@@ -9,11 +10,11 @@ N=19
 EPS= 0.000001
 EXPECTED_CLIQUE=57
 
-mat=np.empty((N,N), 'uint8')
-mat_inv=np.empty_like(mat)
+#mat=np.empty((N,N), 'uint8')
+#mat_inv=np.empty_like(mat)
 
-vecs_prod=np.empty((1<<N,N))
-verts=np.empty_like(vecs_prod)
+vecs_prod=[]
+verts=[]
 
 vec_j=np.ones(N)
 
@@ -32,9 +33,8 @@ def stringtomat(s):
 	mat=EIGEN*I-A
 	return np.linalg.inv(mat)
 
-@numba.jit(nopython=True, fastmath=True)
+@numba.jit(nopython=True)
 def checkVert(v, mat_inv):
-	#print(v)
 	prod=np.dot(mat_inv, v)
 	res=np.dot(prod, vec_j)
 	if abs(res+1) < EPS:
@@ -84,16 +84,17 @@ with open(filepath, 'rb') as fp: #create output file
 	with open(filepath + '.out', 'wb') as op: #open input file
 		s=fp.readline()
 		while s:
+			verts.clear()
+			vecs_prod.clear()
 			mat_inv=stringtomat(s.strip())
-			cache_size=0
 			gen=vecgen()
 			for idx, v in enumerate(gen):
 				results = checkVert(v, mat_inv)
-				if not np.array_equiv(results[0], np.array([2.])):
-					verts[cache_size], vecs_prod[cache_size] = results
-					cache_size += 1
+				if not len(results[0]) == 1:
+					verts.append(results[0])
+					vecs_prod.append(results[1])
 				if idx % 10000 == 0:
-					print(idx, '/', 1<<N, '\t', round(idx*100/(1<<N),10), '%', '\t', cache_size, 'hits')
-			A=constructGraph(cache_size, vecs_prod, verts)
+					print(idx, '/', 1<<N, '\t', round(idx*100/(1<<N),10), '%', '\t', len(verts), 'hits')
+			A=constructGraph(len(verts), np.array(vecs_prod), np.array(verts))
 			op.write(nx.to_graph6_bytes(nx.Graph(A), header=False))
 			s=fp.readline()
