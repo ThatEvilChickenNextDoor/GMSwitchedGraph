@@ -73,11 +73,11 @@ def combgen():
 	for i in range(len(combs)):
 		for pos in combs[i]:
 			comb_vecs[i, pos]=1
-		for head in header:
-			for first in comb_vecs:
-				for second in comb_vecs:
-					for third in comb_vecs:
-						yield np.concatenate((top,head,first,second,third))
+	for head in header:
+		for first in comb_vecs:
+			for second in comb_vecs:
+				for third in comb_vecs:
+					yield np.concatenate((top,head,first,second,third))
 
 filepath=sys.argv[1] #save input filepath
 with open(filepath, 'rb') as fp: #create output file
